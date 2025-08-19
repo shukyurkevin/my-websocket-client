@@ -1,6 +1,5 @@
-package com.kevin.ws;
+package com.kevin;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -10,20 +9,18 @@ import okio.ByteString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class WebSocketConnector {
-  private final OkHttpClient client;
-  private WebSocket webSocket;
 
-  public WebSocketConnector(){
-    this.client = new OkHttpClient();
-  }
+public class Main {
 
-  public void connect(String url){
+  public static void main(String[] args) throws InterruptedException {
+
+    OkHttpClient client = new OkHttpClient();
+
     Request request = new Request.Builder()
-        .url(url)
+        .url("ws://localhost:8081/ws/basic")
         .build();
 
-    this.webSocket = client.newWebSocket(request, new WebSocketListener() {
+    WebSocket webSocket = client.newWebSocket(request, new WebSocketListener() {
 
       @Override
       public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
@@ -52,12 +49,27 @@ public class WebSocketConnector {
       }
 
       @Override
-      public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
-        super.onOpen(webSocket, response);
-      }
+      public void onOpen(WebSocket webSocket, Response response) {
+        System.out.println("✅ Connected, sending subscription...");
 
+        String subscribeMsg = """
+                    {
+                      "type": "subscribe",
+                      "params": [
+                        {
+                          "id": 1,
+                          "tick-interval": 100,
+                          "channel": "kevin_updates"
+                        }
+                      ]
+                    }
+                    """;
+        webSocket.send(subscribeMsg);
+      }
     });
 
-  }
+    client.dispatcher().executorService().shutdown();
 
+  }
 }
+

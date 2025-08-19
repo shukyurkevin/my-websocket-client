@@ -1,14 +1,22 @@
 package com.kevin.models;
 
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class Subscri {
-  public String type = "subscribe";
-  public List<Map<String, Object>> params;
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class SubscriptionRequest {
 
-  public SubscribeRequest(){}
-  public SubscribeRequest (List<Map<String, Object>> params) {
-    this.params = params;
-  }
+  private Long id;
+
+  @JsonProperty("tick-interval")
+  private int tickInterval;
+
+  private String channel;
+
 }
