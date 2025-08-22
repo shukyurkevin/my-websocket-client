@@ -32,5 +32,12 @@ public class JsonUtils {
     return MAPPER.treeToValue(node, clazz);
   }
 
+  public static String toJson(Object obj) {
+    try {
+      return MAPPER.writeValueAsString(obj);
+    } catch (JsonProcessingException e) {
+      throw new JsonParceException("error while writing object to JSON", e);
+    }
+  }
   
 }
