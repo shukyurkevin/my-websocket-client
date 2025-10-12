@@ -12,9 +12,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class WebSocketConnector {
   private final OkHttpClient client;
-  private WebSocket webSocket;
 
-  public WebSocketConnector(){
+  private WebSocket webSocket;
+    public WebSocketConnector(){
     this.client = new OkHttpClient();
   }
 
@@ -23,40 +23,54 @@ public class WebSocketConnector {
         .url(url)
         .build();
 
-    this.webSocket = client.newWebSocket(request, new WebSocketListener() {
+      webSocket = client.newWebSocket(request, new WebSocketListener() {
 
-      @Override
-      public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-        super.onClosed(webSocket, code, reason);
-      }
+          @Override
+          public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+              super.onClosed(webSocket, code, reason);
+          }
 
-      @Override
-      public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-        super.onClosing(webSocket, code, reason);
-      }
+          @Override
+          public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+              super.onClosing(webSocket, code, reason);
+          }
 
-      @Override
-      public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t,
-                            @Nullable Response response) {
-        super.onFailure(webSocket, t, response);
-      }
+          @Override
+          public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t,
+                                @Nullable Response response) {
+              super.onFailure(webSocket, t, response);
+          }
 
-      @Override
-      public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-        super.onMessage(webSocket, text);
-      }
+          @Override
+          public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
+              System.out.println(text);
+              super.onMessage(webSocket, text);
+          }
 
-      @Override
-      public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
-        super.onMessage(webSocket, bytes);
-      }
+          @Override
+          public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
+              super.onMessage(webSocket, bytes);
+          }
 
-      @Override
-      public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
-        super.onOpen(webSocket, response);
-      }
+          @Override
+          public void onOpen(@NotNull WebSocket webSocket, Response response) {
+              System.out.println("Connected, sending subscription...");
 
-    });
+              String subscribeMsg = """
+                       {
+                                     "type": "subscribe",
+                                     "params": {
+                                       "id": 1,
+                                       "tick-interval": 100,
+                                       "channel": "kevin_updates"
+                                     }
+                                   }
+                      """;
+              webSocket.send(subscribeMsg);
+              System.out.println("Subscription subscribed!");
+          }
+
+      });
 
   }
 
