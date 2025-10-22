@@ -26,6 +26,14 @@ public class JsonUtils {
     }
 
   }
+  public static String toJson(Object object){
+      try {
+          return MAPPER.writeValueAsString(object);
+      } catch (JsonProcessingException e) {
+          throw new JsonParceException("error while parsing object into JSON", e);
+      }
+
+  }
 
   public static <T> T fromJsonNode(JsonNode node, Class<T> clazz) throws Exception {
     JavaType type = MAPPER.getTypeFactory().constructType(clazz);

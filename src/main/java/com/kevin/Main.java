@@ -1,5 +1,10 @@
 package com.kevin;
 
+import com.kevin.enums.MessageType;
+import com.kevin.models.Message;
+import com.kevin.models.SubscriptionRequest;
+import com.kevin.models.UnSubscriptionRequest;
+import com.kevin.util.JsonUtils;
 import com.kevin.ws.WebSocketConnector;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -14,16 +19,35 @@ import org.jetbrains.annotations.Nullable;
 public class Main {
 
   public static void main(String[] args) throws InterruptedException {
+    WebSocketConnector connector = new WebSocketConnector();
 
-      WebSocketConnector connector = new WebSocketConnector();
+      connector.connect("ws://localhost:8081/ws/basic");
 
-    OkHttpClient client = new OkHttpClient();
+      SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+              .channel("kevin_updates")
+              .id(1L)
+              .tickInterval(10000)
+              .build();
 
-    connector.connect("ws://localhost:8081/ws/basic");
+      connector.send(MessageType.SUBSCRIBE, subscriptionRequest);
+
+      Thread.sleep(3000);
+      UnSubscriptionRequest unSubscriptionRequest = UnSubscriptionRequest.builder()
+              .channel("kevin_updates")
+              .id(1L)
+              .tickInterval(10000)
+              .build();
+
+      connector.send(MessageType.UNSUBSCRIBE, unSubscriptionRequest);
 
 
-
-    client.dispatcher().executorService().shutdown();
+      //                       {
+//                                     "type": "subscribe",
+//                                     "params": {
+//                                       "id": 1,
+//                                       "tick-interval": 10000,
+//                                       "channel": "kevin_updates"
+//                                     }
 
   }
 }

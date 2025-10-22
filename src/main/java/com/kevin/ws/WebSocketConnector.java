@@ -1,6 +1,9 @@
 package com.kevin.ws;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kevin.enums.MessageType;
+import com.kevin.models.Message;
+import com.kevin.models.SubscriptionRequest;
+import com.kevin.util.JsonUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -23,7 +26,7 @@ public class WebSocketConnector {
         .url(url)
         .build();
 
-      webSocket = client.newWebSocket(request, new WebSocketListener() {
+      this.webSocket = client.newWebSocket(request, new WebSocketListener() {
 
           @Override
           public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
@@ -56,22 +59,40 @@ public class WebSocketConnector {
           public void onOpen(@NotNull WebSocket webSocket, Response response) {
               System.out.println("Connected, sending subscription...");
 
-              String subscribeMsg = """
-                       {
-                                     "type": "subscribe",
-                                     "params": {
-                                       "id": 1,
-                                       "tick-interval": 100,
-                                       "channel": "kevin_updates"
-                                     }
-                                   }
-                      """;
-              webSocket.send(subscribeMsg);
-              System.out.println("Subscription subscribed!");
+//              SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+//                      .channel("kevin_updates")
+//                      .id(1L)
+//                      .tickInterval(10000)
+//                      .build();
+//              send(MessageType.SUBSCRIBE, subscriptionRequest);
+
+//              String subscribeMsg = """
+//                       {
+//                                     "type": "subscribe",
+//                                     "params": {
+//                                       "id": 1,
+//                                       "tick-interval": 10000,
+//                                       "channel": "kevin_updates"
+//                                     }
+//                                   }
+//                      """;
+ //             webSocket.send(subscribeMsg);
+ //             System.out.println("subscribed!");
           }
 
       });
+    }
 
-  }
+    public void sendMessage(@NotNull Message message){
+        webSocket.send(JsonUtils.toJson(message));
+    }
+    public <T> void send(MessageType messageType, T params){
+        var message = Message.builder()
+                .timestamp(System.currentTimeMillis())
+                .type(messageType)
+                .params(params)
+                .build();
+        sendMessage(message);
+    }
 
 }

@@ -8,13 +8,13 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class SubscriptionRequest {
+public class UnSubscriptionRequest {
 
-  private Long id;
+    private Long id;
 
-  @JsonProperty("tick-interval")
-  private int tickInterval;
+    @JsonProperty("tick-interval")
+    private int tickInterval;
 
-  private String channel;
+    private String channel;
 
 }
