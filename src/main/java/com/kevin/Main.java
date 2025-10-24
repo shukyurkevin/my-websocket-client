@@ -1,45 +1,52 @@
 package com.kevin;
 
 import com.kevin.enums.MessageType;
-import com.kevin.models.Message;
 import com.kevin.models.SubscriptionRequest;
-import com.kevin.models.UnSubscriptionRequest;
-import com.kevin.util.JsonUtils;
 import com.kevin.ws.WebSocketConnector;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import okio.ByteString;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Scanner;
 
 
 public class Main {
 
-  public static void main(String[] args) throws InterruptedException {
-    WebSocketConnector connector = new WebSocketConnector();
+    public static void main(String[] args) throws InterruptedException {
 
-      connector.connect("ws://localhost:8081/ws/basic");
 
-      SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
-              .channel("kevin_updates")
-              .id(1L)
-              .tickInterval(10000)
-              .build();
+        WebSocketConnector connector = new WebSocketConnector();
 
-      connector.send(MessageType.SUBSCRIBE, subscriptionRequest);
+        connector.connect("ws://localhost:8081/ws/basic");
 
-      Thread.sleep(3000);
-      UnSubscriptionRequest unSubscriptionRequest = UnSubscriptionRequest.builder()
-              .channel("kevin_updates")
-              .id(1L)
-              .tickInterval(10000)
-              .build();
+        connector.awaitReconnection();
 
-      connector.send(MessageType.UNSUBSCRIBE, unSubscriptionRequest);
+        Scanner scanner = new Scanner(System.in);
+        SubscriptionRequest subscriptionRequest = SubscriptionRequest.builder()
+                .channel("kevin_updates")
+                .id(1L)
+                .tickInterval(5000)
+                .build();
 
+
+        while (true) {
+            System.out.println("Enter 1 to subscribe, 2 to unsubscribe, or 0 to exit:");
+            int choice = scanner.nextInt();
+            if (choice == 0) {
+                System.out.println("Exiting...");
+                System.exit(0);
+            }
+            switch (choice) {
+                case 1:
+                    connector.send(MessageType.SUBSCRIBE, subscriptionRequest);
+                    break;
+                case 2:
+                    connector.send(MessageType.UNSUBSCRIBE, subscriptionRequest);
+                    break;
+                default:
+                    System.out.println("Invalid option");
+                    break;
+            }
+        }
+    }
+}
 
       //                       {
 //                                     "type": "subscribe",
@@ -49,6 +56,5 @@ public class Main {
 //                                       "channel": "kevin_updates"
 //                                     }
 
-  }
-}
+
 
